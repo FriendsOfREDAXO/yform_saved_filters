@@ -105,6 +105,4 @@ MIT License
 
 **Danksagungen:**
 
-Inspiriert durch das Filter-System von [ForCal](https://github.com/FriendsOfREDAXO/forcal)
-
 Code-Patterns und Integration basierend auf [Quick Navigation](https://github.com/FriendsOfREDAXO/quick_navigation), [yform_usability](https://github.com/FriendsOfREDAXO/yform_usability) und yform_export
