@@ -1,7 +1,5 @@
 # YForm Saved Filters für REDAXO
 
-![Screenshot](https://github.com/FriendsOfREDAXO/yform_saved_filters/blob/assets/screenshot.png)
-
 Ermöglicht das Speichern und Wiederverwenden von Suchfiltern in YForm Manager Tabellen.
 
 ## Features
