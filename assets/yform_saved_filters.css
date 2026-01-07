@@ -1,0 +1,29 @@
+/**
+ * YForm Saved Filters - CSS
+ */
+
+/* Filter-Buttons mit Abstand */
+.rex-page-yform-manager .rex-nav-top .btn-group {
+    margin-left: 5px;
+}
+
+/* Erster Filter-Button: deutlich mehr Abstand zu YForm-Standard-Buttons */
+.yform-saved-filters-first {
+    margin-left: 15px !important;
+}
+
+#yform-save-filter-modal .modal-dialog {
+    max-width: 600px;
+}
+
+#yform-save-filter-modal .panel-body table {
+    font-size: 13px;
+}
+
+#yform-save-filter-modal .panel-body table td {
+    padding: 5px 8px;
+}
+
+#yform-save-filter-modal .form-group {
+    margin-bottom: 20px;
+}

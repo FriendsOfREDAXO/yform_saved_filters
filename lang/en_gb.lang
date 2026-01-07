@@ -1,0 +1,45 @@
+yform_saved_filters_title = YForm Saved Filters
+
+# Saved Filters
+yform_saved_filters_saved_filters = Saved Filters
+yform_saved_filters_save_filter = Save Filter
+yform_saved_filters_save_current_filter = Save Current Filter
+yform_saved_filters_reset_filters = Reset Filters
+yform_saved_filters_filter_name = Filter Name
+yform_saved_filters_filter_active_hint = Filter active - save now?
+yform_saved_filters_no_filters_active = No filters active
+
+# Filter Management
+yform_saved_filters_load_filter = Load Filter
+yform_saved_filters_delete_filter = Delete Filter
+yform_saved_filters_delete_filter_confirm = Really delete filter?
+yform_saved_filters_set_as_default = Set as Default
+yform_saved_filters_set_as_default_filter = Load as default filter when opening
+yform_saved_filters_default_filter = Default Filter
+yform_saved_filters_unset_default = Remove Default
+yform_saved_filters_manage_filters = Manage Filters
+yform_saved_filters_close = Close
+
+# Filter Preview
+yform_saved_filters_current_filter_settings = Current Filter Settings
+yform_saved_filters_search_term = Search Term
+yform_saved_filters_field_filters = Field Filters
+yform_saved_filters_sort_by = Sorting
+yform_saved_filters_sort_asc = Ascending
+yform_saved_filters_sort_desc = Descending
+
+# General
+yform_saved_filters_save = Save
+yform_saved_filters_cancel = Cancel
+yform_saved_filters_delete = Delete
+yform_saved_filters_name = Name
+yform_saved_filters_actions = Actions
+yform_saved_filters_created = Created
+
+# Backwards compatibility (without prefix)
+saved_filters = Saved Filters
+save_filter = Save Filter
+save_current_filter = Save Current Filter
+filter_name = Filter Name
+filter_active_hint = Filter active - save now?
+no_filters_active = No filters active
