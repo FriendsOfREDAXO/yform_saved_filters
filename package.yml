@@ -3,11 +3,6 @@ version: '1.0.0'
 author: 'Friends Of REDAXO'
 supportpage: https://github.com/FriendsOfREDAXO/yform_saved_filters
 
-page:
-    title: 'translate:yform_saved_filters_title'
-    perm: yform_saved_filters[]
-    icon: rex-icon fa-filter
-
 requires:
     redaxo: '^5.15'
     packages:
