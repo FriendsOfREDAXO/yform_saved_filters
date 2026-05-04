@@ -12,10 +12,18 @@ $addon = rex_addon::get('yform_saved_filters');
 $user = rex::getUser();
 $userId = $user->getId();
 $tableName = rex_request('table_name', 'string', '');
+$currentPage = rex_be_controller::getCurrentPage();
 
 if (!$tableName) {
     return;
 }
+
+$buildBaseUrl = static function (array $params = []) use ($currentPage, $tableName): string {
+    return rex_url::backendController(array_merge([
+        'page' => $currentPage,
+        'table_name' => $tableName,
+    ], $params), false);
+};
 
 // Service-Instanz
 $service = new YFormFilterService();
@@ -78,8 +86,8 @@ if (rex_post('yform_save_filter', 'string') === '1' && $hasActiveFilter) {
         
         $service->saveFilter($userId, $tableName, $filterName, $filterData, $setAsDefault);
         
-        // Redirect zu aktueller Seite mit Filtern - URL manuell bauen
-        $url = 'index.php?page=yform/manager/data_edit&table_name=' . urlencode($tableName);
+        // Redirect zur aktuellen Seite mit Filtern (auch für eingebettete Tabellen)
+        $url = $buildBaseUrl();
         if (!empty($rex_yform_filter)) {
             foreach ($rex_yform_filter as $key => $value) {
                 $valueStr = is_array($value) ? implode(',', $value) : $value;
@@ -109,13 +117,13 @@ if (rex_post('yform_save_filter', 'string') === '1' && $hasActiveFilter) {
 // Filter löschen
 if ($deleteId = rex_request('delete_yform_filter', 'int', 0)) {
     $service->deleteFilter($deleteId, $userId);
-    rex_response::sendRedirect('index.php?page=yform/manager/data_edit&table_name=' . urlencode($tableName));
+    rex_response::sendRedirect($buildBaseUrl());
 }
 
 // Als Standard setzen
 if ($defaultId = rex_request('set_default_yform_filter', 'int', 0)) {
     $service->setDefaultFilter($defaultId, $userId);
-    rex_response::sendRedirect('index.php?page=yform/manager/data_edit&table_name=' . urlencode($tableName));
+    rex_response::sendRedirect($buildBaseUrl());
 }
 
 // Filter laden
@@ -123,7 +131,7 @@ if ($loadId = rex_request('load_yform_filter', 'int', 0)) {
     $loadedFilter = $service->getFilter($loadId, $userId);
     if ($loadedFilter) {
         $filterData = $loadedFilter['filter_data'];
-        $url = 'index.php?page=yform/manager/data_edit&table_name=' . urlencode($tableName);
+        $url = $buildBaseUrl();
         
         if (!empty($filterData['rex_yform_filter'])) {
             foreach (array_filter($filterData['rex_yform_filter']) as $key => $value) {
@@ -174,7 +182,7 @@ if (!$skipDefaultFilter) {
     $defaultFilter = $service->getDefaultFilter($userId, $tableName);
     if ($defaultFilter) {
         $filterData = $defaultFilter['filter_data'];
-        $url = 'index.php?page=yform/manager/data_edit&table_name=' . urlencode($tableName) . '&default_loaded=1';
+        $url = $buildBaseUrl(['default_loaded' => 1]);
         
         $hasFilters = false;
         if (!empty($filterData['rex_yform_filter'])) {
@@ -370,14 +378,14 @@ if (!empty($savedFilters)):
                             </td>
                             <td>
                                 <?php if (!$filter['is_default']): ?>
-                                <a href="index.php?page=yform/manager/data_edit&table_name=<?= urlencode($tableName) ?>&set_default_yform_filter=<?= $filter['id'] ?>" 
+                                          <a href="<?= rex_escape($buildBaseUrl(['set_default_yform_filter' => (int) $filter['id']])) ?>" 
                                    class="btn btn-default btn-xs" 
                                    title="<?= $addon->i18n('set_as_default') ?>">
                                     <i class="fa fa-star"></i>
                                 </a>
                                 <?php endif; ?>
                                 
-                                <a href="index.php?page=yform/manager/data_edit&table_name=<?= urlencode($tableName) ?>&delete_yform_filter=<?= $filter['id'] ?>" 
+                                          <a href="<?= rex_escape($buildBaseUrl(['delete_yform_filter' => (int) $filter['id']])) ?>" 
                                    class="btn btn-danger btn-xs" 
                                    title="<?= $addon->i18n('delete') ?>"
                                    onclick="return confirm('<?= $addon->i18n('delete_filter_confirm') ?>');">

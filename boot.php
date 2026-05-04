@@ -24,6 +24,7 @@ if (rex::isBackend() && rex::getUser()) {
     rex_extension::register('YFORM_DATA_LIST_LINKS', function(rex_extension_point $ep) {
         $linkSets = $ep->getSubject();
         $table = $ep->getParams()['table'] ?? null;
+        $currentPage = rex_be_controller::getCurrentPage();
         
         if (!$table) {
             return $linkSets;
@@ -44,8 +45,12 @@ if (rex::isBackend() && rex::getUser()) {
                 // filter_data ist bereits ein Array (wurde in getUserFilters() dekodiert)
                 $filterData = $filter['filter_data'];
                 
-                // URL manuell bauen - mit default_loaded=1 um Default-Filter-Auto-Load zu verhindern
-                $url = 'index.php?page=yform/manager/data_edit&table_name=' . urlencode($tableName) . '&default_loaded=1';
+                // URL auf aktueller Seite aufbauen (funktioniert auch bei eingebetteten Tabellen)
+                $url = rex_url::backendController([
+                    'page' => $currentPage,
+                    'table_name' => $tableName,
+                    'default_loaded' => 1,
+                ], false);
                 
                 // Füge Filter-Parameter hinzu
                 if (isset($filterData['rex_yform_filter'])) {
@@ -116,7 +121,11 @@ if (rex::isBackend() && rex::getUser()) {
             // "Filter zurücksetzen" Button
             $item = [];
             $item['label'] = '<i class="fa fa-filter-circle-xmark" aria-hidden="true"></i>&nbsp;&nbsp;' . rex_i18n::msg('yform_saved_filters_reset_filters');
-            $item['url'] = 'index.php?page=yform/manager/data_edit&table_name=' . urlencode($tableName) . '&default_loaded=1';
+            $item['url'] = rex_url::backendController([
+                'page' => $currentPage,
+                'table_name' => $tableName,
+                'default_loaded' => 1,
+            ], false);
             $item['attributes']['class'][] = 'btn-default';
             
             $linkSets['table_links'][] = $item;
