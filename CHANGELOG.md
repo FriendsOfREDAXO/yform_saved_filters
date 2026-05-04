@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.4 (2026-05-04)
+## 1.1.0 (2026-05-04)
 
 - Feature: In der "Filter verwalten"-Ansicht können globale Filter jetzt direkt per Button gesetzt oder entfernt werden.
 - UX: Globale Filterverwaltung ist damit ohne erneutes Speichern eines Filters möglich.
