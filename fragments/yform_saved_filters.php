@@ -11,6 +11,7 @@ use FriendsOfREDAXO\YFormSavedFilters\YFormFilterService;
 $addon = rex_addon::get('yform_saved_filters');
 $user = rex::getUser();
 $userId = $user->getId();
+$canManageGlobalDefaults = YFormFilterService::canManageGlobalDefaults($user);
 $tableName = rex_request('table_name', 'string', '');
 $currentPage = rex_be_controller::getCurrentPage();
 
@@ -74,6 +75,8 @@ try {
 if (rex_post('yform_save_filter', 'string') === '1' && $hasActiveFilter) {
     $filterName = rex_post('filter_name', 'string', '');
     $setAsDefault = rex_post('set_as_default', 'int', 0) === 1;
+    $setAsGlobal = $canManageGlobalDefaults && rex_post('set_as_global', 'int', 0) === 1;
+    $setAsGlobalDefault = $canManageGlobalDefaults && rex_post('set_as_global_default', 'int', 0) === 1;
     
     if (!empty($filterName)) {
         $filterData = [
@@ -84,7 +87,7 @@ if (rex_post('yform_save_filter', 'string') === '1' && $hasActiveFilter) {
             'sorttype' => $list_sorttype,
         ];
         
-        $service->saveFilter($userId, $tableName, $filterName, $filterData, $setAsDefault);
+        $service->saveFilter($userId, $tableName, $filterName, $filterData, $setAsDefault, $setAsGlobal, $setAsGlobalDefault);
         
         // Redirect zur aktuellen Seite mit Filtern (auch für eingebettete Tabellen)
         $url = $buildBaseUrl();
@@ -116,13 +119,29 @@ if (rex_post('yform_save_filter', 'string') === '1' && $hasActiveFilter) {
 
 // Filter löschen
 if ($deleteId = rex_request('delete_yform_filter', 'int', 0)) {
-    $service->deleteFilter($deleteId, $userId);
+    $service->deleteFilter($deleteId, $userId, $canManageGlobalDefaults);
     rex_response::sendRedirect($buildBaseUrl());
 }
 
 // Als Standard setzen
 if ($defaultId = rex_request('set_default_yform_filter', 'int', 0)) {
     $service->setDefaultFilter($defaultId, $userId);
+    rex_response::sendRedirect($buildBaseUrl());
+}
+
+// Als global markieren
+if ($setGlobalId = rex_request('set_global_yform_filter', 'int', 0)) {
+    if ($canManageGlobalDefaults) {
+        $service->setGlobalFilter($setGlobalId, $userId, true);
+    }
+    rex_response::sendRedirect($buildBaseUrl());
+}
+
+// Global-Markierung entfernen
+if ($unsetGlobalId = rex_request('unset_global_yform_filter', 'int', 0)) {
+    if ($canManageGlobalDefaults) {
+        $service->setGlobalFilter($unsetGlobalId, $userId, false);
+    }
     rex_response::sendRedirect($buildBaseUrl());
 }
 
@@ -220,7 +239,7 @@ if (!$skipDefaultFilter) {
 // Aktuelle URL-Parameter für Modal
 $currentParams = [];
 foreach ($_GET as $param => $value) {
-    if (!in_array($param, ['yform_save_filter', 'filter_name', 'set_as_default', 'delete_yform_filter', 'set_default_yform_filter', 'load_yform_filter'])) {
+    if (!in_array($param, ['yform_save_filter', 'filter_name', 'set_as_default', 'set_as_global', 'set_as_global_default', 'delete_yform_filter', 'set_default_yform_filter', 'set_global_yform_filter', 'unset_global_yform_filter', 'load_yform_filter'])) {
         $currentParams[$param] = $value;
     }
 }
@@ -330,6 +349,22 @@ function renderHiddenFields($name, $value) {
                             <?= $addon->i18n('set_as_default_filter') ?>
                         </label>
                     </div>
+
+                    <?php if ($canManageGlobalDefaults): ?>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="set_as_global" value="1">
+                            <?= $addon->i18n('set_as_global_filter') ?>
+                        </label>
+                    </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="set_as_global_default" value="1">
+                            <?= $addon->i18n('set_as_global_default_filter') ?>
+                        </label>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="modal-footer">
@@ -375,6 +410,12 @@ if (!empty($savedFilters)):
                                 <?php if ($filter['is_default']): ?>
                                     <span class="label label-primary"><?= $addon->i18n('default_filter') ?></span>
                                 <?php endif; ?>
+                                <?php if (!empty($filter['is_global'])): ?>
+                                    <span class="label label-default"><?= $addon->i18n('global_filter') ?></span>
+                                <?php endif; ?>
+                                <?php if (!empty($filter['is_global_default'])): ?>
+                                    <span class="label label-info"><?= $addon->i18n('global_default_filter') ?></span>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <?php if (!$filter['is_default']): ?>
@@ -384,13 +425,31 @@ if (!empty($savedFilters)):
                                     <i class="fa fa-star"></i>
                                 </a>
                                 <?php endif; ?>
+
+                                <?php if ($canManageGlobalDefaults): ?>
+                                    <?php if (empty($filter['is_global'])): ?>
+                                        <a href="<?= rex_escape($buildBaseUrl(['set_global_yform_filter' => (int) $filter['id']])) ?>"
+                                           class="btn btn-default btn-xs"
+                                           title="<?= $addon->i18n('set_global') ?>">
+                                            <i class="fa fa-globe"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="<?= rex_escape($buildBaseUrl(['unset_global_yform_filter' => (int) $filter['id']])) ?>"
+                                           class="btn btn-info btn-xs"
+                                           title="<?= $addon->i18n('unset_global') ?>">
+                                            <i class="fa fa-globe"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                                 
+                                <?php if (empty($filter['is_global']) || (int) $filter['user_id'] === $userId || $canManageGlobalDefaults): ?>
                                           <a href="<?= rex_escape($buildBaseUrl(['delete_yform_filter' => (int) $filter['id']])) ?>" 
                                    class="btn btn-danger btn-xs" 
                                    title="<?= $addon->i18n('delete') ?>"
                                    onclick="return confirm('<?= $addon->i18n('delete_filter_confirm') ?>');">
                                     <i class="fa fa-trash"></i>
                                 </a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>

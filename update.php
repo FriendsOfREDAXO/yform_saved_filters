@@ -20,10 +20,18 @@ if ($sql->getRows() === 0) {
         ->ensureColumn(new rex_sql_column('name', 'varchar(191)'))
         ->ensureColumn(new rex_sql_column('filter_data', 'text'))
         ->ensureColumn(new rex_sql_column('is_default', 'tinyint(1)', false, '0'))
+        ->ensureColumn(new rex_sql_column('is_global', 'tinyint(1)', false, '0'))
+        ->ensureColumn(new rex_sql_column('is_global_default', 'tinyint(1)', false, '0'))
         ->ensureColumn(new rex_sql_column('createdate', 'datetime'))
         ->ensureColumn(new rex_sql_column('updatedate', 'datetime'))
         ->ensureIndex(new rex_sql_index('user_id', ['user_id'], rex_sql_index::INDEX))
         ->ensureIndex(new rex_sql_index('table_name', ['table_name'], rex_sql_index::INDEX))
         ->ensureIndex(new rex_sql_index('user_table', ['user_id', 'table_name'], rex_sql_index::INDEX))
+        ->ensure();
+} else {
+    // Bestehende Installationen auf neues Schema bringen
+    rex_sql_table::get(rex::getTable('yform_saved_filters'))
+        ->ensureColumn(new rex_sql_column('is_global', 'tinyint(1)', false, '0'))
+        ->ensureColumn(new rex_sql_column('is_global_default', 'tinyint(1)', false, '0'))
         ->ensure();
 }

@@ -35,6 +35,13 @@ yform_saved_filters_delete = Delete
 yform_saved_filters_name = Name
 yform_saved_filters_actions = Actions
 yform_saved_filters_created = Created
+yform_saved_filters_perm_global_default = Set global default filter for all users
+yform_saved_filters_set_as_global_filter = Share for all users (global filter)
+yform_saved_filters_global_filter = Global
+yform_saved_filters_set_as_global_default_filter = Set as global default for all users
+yform_saved_filters_global_default_filter = Global default
+yform_saved_filters_set_global = Set global
+yform_saved_filters_unset_global = Unset global
 
 # Backwards compatibility (without prefix)
 saved_filters = Saved Filters

@@ -10,6 +10,8 @@ Siehe [CHANGELOG.md](CHANGELOG.md).
 
 - ✅ **Benutzerspezifische Filter** - Jeder Benutzer hat seine eigenen gespeicherten Filter
 - ✅ **Standard-Filter** - Automatisches Laden eines bevorzugten Filters
+- ✅ **Globale Filter** - Berechtigte Benutzer können Filter für alle Benutzer freigeben
+- ✅ **Globaler Standard-Filter** - Berechtigte Benutzer können einen tabellenweiten Standard setzen
 - ✅ **Filter-Vorschau** - Vor dem Speichern werden alle aktiven Filter angezeigt
 - ✅ **Tabellenübergreifend** - Funktioniert mit allen YForm Manager Tabellen
 - ✅ **Sortierung** - Filter speichern auch die aktuelle Sortierung
@@ -32,6 +34,7 @@ Siehe [CHANGELOG.md](CHANGELOG.md).
 3. Klicke auf **"Filter speichern"**
 4. Gib einen Namen für den Filter ein
 5. Optional: Setze den Filter als Standard-Filter
+6. Optional (mit Berechtigung): Setze den Filter als globalen Filter oder globalen Standard
 
 ### Filter laden
 
@@ -42,6 +45,7 @@ Siehe [CHANGELOG.md](CHANGELOG.md).
 
 - Klicke auf **"Filter verwalten"** um alle gespeicherten Filter anzuzeigen
 - **Als Standard setzen**: Stern-Symbol in der Filter-Verwaltung
+- **Global setzen/entfernen**: Weltkugel-Symbol in der Filter-Verwaltung (nur mit Berechtigung)
 - **Löschen**: Löschen-Button in der Filter-Verwaltung
 
 ### Filter zurücksetzen
@@ -61,6 +65,8 @@ Das AddOn erstellt die Tabelle `rex_yform_saved_filters`:
 - name            VARCHAR(255) (Filter-Name)
 - filter_data     TEXT (JSON mit Filtereinstellungen)
 - is_default      TINYINT (Standard-Filter: 0/1)
+- is_global       TINYINT (Global freigegeben: 0/1)
+- is_global_default TINYINT (Globaler Standard: 0/1)
 - createdate      DATETIME
 - updatedate      DATETIME
 ```
@@ -82,13 +88,19 @@ Gespeichert werden:
 Die Klasse `YFormFilterService` bietet folgende Methoden:
 
 ```php
-YFormFilterService::saveFilter($userId, $tableName, $name, $filterData, $isDefault)
+YFormFilterService::saveFilter($userId, $tableName, $name, $filterData, $isDefault, $isGlobal, $isGlobalDefault)
 YFormFilterService::getUserFilters($userId, $tableName)
 YFormFilterService::getFilter($filterId, $userId)
 YFormFilterService::getDefaultFilter($userId, $tableName)
 YFormFilterService::deleteFilter($filterId, $userId)
 YFormFilterService::setDefaultFilter($filterId, $userId)
+YFormFilterService::setGlobalFilter($filterId, $userId, $isGlobal)
+YFormFilterService::setGlobalDefaultFilter($filterId, $userId)
 ```
+
+## Berechtigungen
+
+- `yform_saved_filters[global_default]`: Darf globale Filter und globale Standard-Filter setzen/entfernen.
 
 ## Lizenz
 

@@ -1,5 +1,5 @@
 package: yform_saved_filters
-version: '1.0.1'
+version: '1.0.4'
 author: 'Friends Of REDAXO'
 supportpage: https://github.com/FriendsOfREDAXO/yform_saved_filters
 
@@ -7,3 +7,6 @@ requires:
     redaxo: '^5.15'
     packages:
         yform: '^5.0'
+
+perm:
+    yform_saved_filters[global_default]: 'translate:yform_saved_filters_perm_global_default'
